@@ -71,6 +71,8 @@ We will climb the Tor while the mist still holds.
 
 St Michael's Tower has stood at the summit for seven hundred years, watching pilgrims arrive at sunrise. Now it is watching for you.
 
+The moon will be almost full as you climb. She will have only just set.
+
 Four counties at your feet.
 Wind in your hair.
 The whole valley breathing.

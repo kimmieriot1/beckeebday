@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import TarotCard from './TarotCard.jsx'
 import { cards } from '../../data/cards.js'
-import { play, stop, fadeAmbientTo } from '../../utils/audio.js'
+import { play, stop, fadeAmbientTo, playCardFlip } from '../../utils/audio.js'
 
 // Walks through all nine cards, one at a time. The Empress dims the ambient
 // drone so her words can be heard clearly, and a single sustained tone rises
@@ -45,7 +45,7 @@ export default function CardSequence({ onComplete }) {
           <TarotCard
             card={card}
             size={card.isHero ? 'md' : 'sm'}
-            onFlip={() => play('flip')}
+            onFlip={() => playCardFlip()}
             onAdvance={handleAdvance}
           />
         </motion.div>

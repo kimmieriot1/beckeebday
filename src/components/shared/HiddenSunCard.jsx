@@ -1,9 +1,25 @@
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import TarotCard from '../cards/TarotCard.jsx'
 import { sunCard } from '../../data/cards.js'
+import { playCardFlip } from '../../utils/audio.js'
+import Petals from './Petals.jsx'
 
 // Overlay revealed when the moon is tapped five times.
+// On flip, golden petals fall over the whole screen.
 export default function HiddenSunCard({ open, onDismiss }) {
+  const [petalsActive, setPetalsActive] = useState(false)
+
+  function handleFlip() {
+    playCardFlip()
+    setPetalsActive(true)
+  }
+
+  function handleDismiss() {
+    setPetalsActive(false)
+    onDismiss()
+  }
+
   return (
     <AnimatePresence>
       {open && (
@@ -17,7 +33,7 @@ export default function HiddenSunCard({ open, onDismiss }) {
           aria-modal="true"
           aria-label="The Sun"
           onClick={(e) => {
-            if (e.target === e.currentTarget) onDismiss()
+            if (e.target === e.currentTarget) handleDismiss()
           }}
         >
           <div
@@ -27,6 +43,8 @@ export default function HiddenSunCard({ open, onDismiss }) {
                 'radial-gradient(circle at 50% 30%, rgba(244,211,94,0.18) 0%, rgba(5,5,16,0.96) 60%)'
             }}
           />
+
+          <Petals active={petalsActive} />
 
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.95 }}
@@ -39,7 +57,8 @@ export default function HiddenSunCard({ open, onDismiss }) {
               card={sunCard}
               size="md"
               sparkles
-              onAdvance={onDismiss}
+              onFlip={handleFlip}
+              onAdvance={handleDismiss}
             />
           </motion.div>
         </motion.div>

@@ -64,6 +64,59 @@ export function setMuted(muted) {
   try {
     Howler.mute(muted)
   } catch (_e) {}
+  globalMuted = muted
+}
+
+let globalMuted = true
+let synthCtx = null
+
+// Synthesised card-flip whoosh. Soft band-passed white noise with a quick
+// envelope. Works without any asset file. About 250ms long.
+export function playCardFlip() {
+  if (globalMuted) return
+  try {
+    if (!synthCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext
+      if (!Ctx) return
+      synthCtx = new Ctx()
+    }
+    if (synthCtx.state === 'suspended') synthCtx.resume()
+
+    const ctx = synthCtx
+    const now = ctx.currentTime
+    const duration = 0.32
+
+    // White noise buffer
+    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate)
+    const data = buffer.getChannelData(0)
+    for (let i = 0; i < data.length; i++) {
+      // mild colouring: add a touch of brown noise for paper-like texture
+      const white = Math.random() * 2 - 1
+      data[i] = white * (1 - i / data.length) // taper amplitude
+    }
+
+    const noise = ctx.createBufferSource()
+    noise.buffer = buffer
+
+    // Band-pass filter sweeping down for a paper-shuffle quality
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'bandpass'
+    filter.Q.value = 3
+    filter.frequency.setValueAtTime(2400, now)
+    filter.frequency.exponentialRampToValueAtTime(700, now + duration)
+
+    // Soft envelope
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(0, now)
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+
+    noise.connect(filter)
+    filter.connect(gain)
+    gain.connect(ctx.destination)
+    noise.start(now)
+    noise.stop(now + duration + 0.05)
+  } catch (_e) {}
 }
 
 export function startAmbient() {

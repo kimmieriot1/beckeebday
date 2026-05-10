@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { itinerary } from '../../data/itinerary.js'
 import { FiligreeDivider } from '../shared/Filigree.jsx'
+import Lightbox from '../shared/Lightbox.jsx'
 
 // One modal handles every itinerary stop. Variants come from the data shape:
 //   - data.stops: a sub-list of venues (the High Street walk)
@@ -12,11 +13,13 @@ import { FiligreeDivider } from '../shared/Filigree.jsx'
 
 export default function ItineraryModal({ open, itineraryKey, onClose }) {
   const ref = useRef(null)
+  const [lightboxSrc, setLightboxSrc] = useState(null)
 
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose()
+      // Let Lightbox handle its own Escape; only close modal if no lightbox
+      if (e.key === 'Escape' && !lightboxSrc) onClose()
     }
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
@@ -24,11 +27,22 @@ export default function ItineraryModal({ open, itineraryKey, onClose }) {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
     }
-  }, [open, onClose])
+  }, [open, onClose, lightboxSrc])
+
+  // Close lightbox when modal closes
+  useEffect(() => {
+    if (!open) setLightboxSrc(null)
+  }, [open])
 
   const data = itineraryKey && itinerary[itineraryKey]
 
   return (
+    <>
+      <Lightbox
+        src={lightboxSrc}
+        alt={data ? data.title : ''}
+        onClose={() => setLightboxSrc(null)}
+      />
     <AnimatePresence>
       {open && data && (
         <motion.div
@@ -88,7 +102,11 @@ export default function ItineraryModal({ open, itineraryKey, onClose }) {
               <FiligreeDivider tone="gold" className="mt-6 opacity-70" />
 
               {Array.isArray(data.images) && data.images.length > 0 && (
-                <Gallery images={data.images} alt={data.title} />
+                <Gallery
+                  images={data.images}
+                  alt={data.title}
+                  onPick={(src) => setLightboxSrc(src)}
+                />
               )}
 
               {data.intro && (
@@ -187,27 +205,32 @@ export default function ItineraryModal({ open, itineraryKey, onClose }) {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   )
 }
 
-function Gallery({ images, alt }) {
+function Gallery({ images, alt, onPick }) {
   return (
     <div className="mt-6 flex gap-2 overflow-hidden">
       {images.map((src, i) => (
-        <div
+        <button
           key={src}
-          className="relative flex-1 overflow-hidden rounded-md"
+          type="button"
+          onClick={() => onPick(src)}
+          className="group relative flex-1 overflow-hidden rounded-md"
           style={{
             aspectRatio: '4 / 3',
             border: '1px solid rgba(212,175,55,0.25)',
-            boxShadow: 'inset 0 0 30px rgba(0,0,0,0.3)'
+            boxShadow: 'inset 0 0 30px rgba(0,0,0,0.3)',
+            cursor: 'zoom-in'
           }}
+          aria-label={`Open ${alt} (${i + 1}) full size`}
         >
           <img
             src={src}
             alt={`${alt} (${i + 1})`}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             style={{ filter: 'brightness(0.85) saturate(0.9)' }}
             onError={(e) => {
               e.currentTarget.parentElement.style.display = 'none'
@@ -222,7 +245,7 @@ function Gallery({ images, alt }) {
                 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.35) 100%)'
             }}
           />
-        </div>
+        </button>
       ))}
     </div>
   )
