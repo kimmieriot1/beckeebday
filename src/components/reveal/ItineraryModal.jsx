@@ -87,6 +87,10 @@ export default function ItineraryModal({ open, itineraryKey, onClose }) {
 
               <FiligreeDivider tone="gold" className="mt-6 opacity-70" />
 
+              {Array.isArray(data.images) && data.images.length > 0 && (
+                <Gallery images={data.images} alt={data.title} />
+              )}
+
               {data.intro && (
                 <p className="mt-6 font-period text-[16px] italic leading-relaxed text-text-cream/95">
                   {data.intro}
@@ -183,6 +187,44 @@ export default function ItineraryModal({ open, itineraryKey, onClose }) {
         </motion.div>
       )}
     </AnimatePresence>
+  )
+}
+
+function Gallery({ images, alt }) {
+  return (
+    <div className="mt-6 flex gap-2 overflow-hidden">
+      {images.map((src, i) => (
+        <div
+          key={src}
+          className="relative flex-1 overflow-hidden rounded-md"
+          style={{
+            aspectRatio: '4 / 3',
+            border: '1px solid rgba(212,175,55,0.25)',
+            boxShadow: 'inset 0 0 30px rgba(0,0,0,0.3)'
+          }}
+        >
+          <img
+            src={src}
+            alt={`${alt} (${i + 1})`}
+            loading="lazy"
+            className="h-full w-full object-cover"
+            style={{ filter: 'brightness(0.85) saturate(0.9)' }}
+            onError={(e) => {
+              e.currentTarget.parentElement.style.display = 'none'
+            }}
+          />
+          {/* subtle vignette over each image so it sits in the dark */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.35) 100%)'
+            }}
+          />
+        </div>
+      ))}
+    </div>
   )
 }
 
