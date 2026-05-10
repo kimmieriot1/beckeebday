@@ -29,15 +29,12 @@ export default function EndScreen({ onBack }) {
         className="flex w-full max-w-md flex-col items-center text-center"
       >
         <p className="font-roman text-[10px] uppercase tracking-sacred text-gold-bright">
-          A weekend ends, the rest begins
+          A weekend ends, the rest begins.
         </p>
         <FiligreeDivider tone="gold" className="mt-5 opacity-80" />
         <h2 className="mt-6 font-display text-3xl italic leading-tight text-text-cream sm:text-4xl">
-          Your weekend, Rebecca May Magdeline.
+          Your weekend, drawn by the stars.
         </h2>
-        <p className="mt-3 font-period italic text-text-cream/85">
-          Drawn by the stars. Built by hand.
-        </p>
       </motion.div>
 
       <motion.div
@@ -74,7 +71,9 @@ export default function EndScreen({ onBack }) {
         className="mt-12 flex w-full max-w-md flex-col items-center"
       >
         <PortraitFrame />
-        <p className="mt-4 font-period italic text-text-cream/85">With love, always.</p>
+        <p className="mt-4 font-display text-xl italic text-gold-bright">
+          Your Witchy Weekend Awaits!
+        </p>
       </motion.div>
 
       <motion.div

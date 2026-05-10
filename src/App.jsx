@@ -15,7 +15,7 @@ import GrainOverlay from './components/shared/GrainOverlay.jsx'
 import Vignette from './components/shared/Vignette.jsx'
 import SmokeTransition from './components/shared/SmokeTransition.jsx'
 import { sunCard } from './data/cards.js'
-import { setMuted, startAmbient } from './utils/audio.js'
+import { setMuted, startAmbient, primeAudio } from './utils/audio.js'
 
 export default function App() {
   const [phase, setPhase] = useState('landing')
@@ -63,6 +63,7 @@ export default function App() {
           >
             <LandingScreen
               onBegin={() => {
+                primeAudio()
                 if (audioMuted) {
                   setAudioMutedState(false)
                   startAmbient()

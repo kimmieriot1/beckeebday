@@ -70,10 +70,9 @@ export function setMuted(muted) {
 let globalMuted = true
 let synthCtx = null
 
-// Synthesised card-flip whoosh. Soft band-passed white noise with a quick
-// envelope. Works without any asset file. About 250ms long.
-export function playCardFlip() {
-  if (globalMuted) return
+// Wake the AudioContext on the first user gesture so subsequent plays
+// don't hit iOS Safari's autoplay restrictions.
+export function primeAudio() {
   try {
     if (!synthCtx) {
       const Ctx = window.AudioContext || window.webkitAudioContext
@@ -81,41 +80,65 @@ export function playCardFlip() {
       synthCtx = new Ctx()
     }
     if (synthCtx.state === 'suspended') synthCtx.resume()
+  } catch (_e) {}
+}
+
+// Synthesised card-flip whoosh: a paper-shuffle followed by a soft thump.
+// Two layers, ~400ms total. Loud enough to hear on phone speakers.
+export function playCardFlip() {
+  if (globalMuted) return
+  try {
+    primeAudio()
+    if (!synthCtx) return
 
     const ctx = synthCtx
     const now = ctx.currentTime
-    const duration = 0.32
+    const duration = 0.42
 
-    // White noise buffer
+    // Layer 1: Band-passed white noise (paper rustle)
     const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate)
     const data = buffer.getChannelData(0)
     for (let i = 0; i < data.length; i++) {
-      // mild colouring: add a touch of brown noise for paper-like texture
       const white = Math.random() * 2 - 1
-      data[i] = white * (1 - i / data.length) // taper amplitude
+      data[i] = white * (1 - i / data.length)
     }
-
     const noise = ctx.createBufferSource()
     noise.buffer = buffer
 
-    // Band-pass filter sweeping down for a paper-shuffle quality
     const filter = ctx.createBiquadFilter()
     filter.type = 'bandpass'
-    filter.Q.value = 3
-    filter.frequency.setValueAtTime(2400, now)
-    filter.frequency.exponentialRampToValueAtTime(700, now + duration)
+    filter.Q.value = 2.5
+    filter.frequency.setValueAtTime(2800, now)
+    filter.frequency.exponentialRampToValueAtTime(600, now + duration)
 
-    // Soft envelope
-    const gain = ctx.createGain()
-    gain.gain.setValueAtTime(0, now)
-    gain.gain.linearRampToValueAtTime(0.18, now + 0.02)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0, now)
+    noiseGain.gain.linearRampToValueAtTime(0.45, now + 0.02)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration)
 
     noise.connect(filter)
-    filter.connect(gain)
-    gain.connect(ctx.destination)
+    filter.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
     noise.start(now)
     noise.stop(now + duration + 0.05)
+
+    // Layer 2: A soft low thump at the end (the card landing)
+    const thumpDelay = 0.12
+    const thumpDur = 0.18
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(140, now + thumpDelay)
+    osc.frequency.exponentialRampToValueAtTime(60, now + thumpDelay + thumpDur)
+
+    const thumpGain = ctx.createGain()
+    thumpGain.gain.setValueAtTime(0, now + thumpDelay)
+    thumpGain.gain.linearRampToValueAtTime(0.22, now + thumpDelay + 0.01)
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, now + thumpDelay + thumpDur)
+
+    osc.connect(thumpGain)
+    thumpGain.connect(ctx.destination)
+    osc.start(now + thumpDelay)
+    osc.stop(now + thumpDelay + thumpDur + 0.02)
   } catch (_e) {}
 }
 
