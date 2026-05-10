@@ -22,12 +22,13 @@ export default function CardFront({ card }) {
       {/* art layer */}
       <CardArt id={card.id} />
 
-      {/* dark gradient at top and bottom for legibility */}
+      {/* dark gradient at top and bottom for text legibility, kept narrow
+          so the painted art shows through */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(5,5,16,0.7) 0%, rgba(5,5,16,0) 22%, rgba(5,5,16,0) 70%, rgba(5,5,16,0.85) 100%)'
+            'linear-gradient(to bottom, rgba(5,5,16,0.55) 0%, rgba(5,5,16,0) 14%, rgba(5,5,16,0) 76%, rgba(5,5,16,0.78) 100%)'
         }}
       />
 
