@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg-deep: #050510;
+  --bg-mid: #0a0a1f;
+  --bg-card: #12101a;
+  --silver-glow: #c9c9d4;
+  --silver-mist: #8a8aa0;
+  --gold-warm: #d4af37;
+  --gold-bright: #f4d35e;
+  --gold-deep: #a8801f;
+  --red-magdalene: #8b1e3f;
+  --text-cream: #f5f1e8;
+  --text-muted: #a89e8a;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-deep);
+  color: var(--text-cream);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+  background-image:
+    radial-gradient(1200px 800px at 50% 110%, rgba(20, 14, 36, 0.55), transparent 60%),
+    radial-gradient(900px 600px at 0% 0%, rgba(40, 30, 60, 0.18), transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, rgba(60, 30, 50, 0.14), transparent 60%);
+  background-attachment: fixed;
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: var(--text-cream);
+}
+
+.font-display {
+  font-feature-settings: 'liga' 1, 'dlig' 1, 'swsh' 1;
+}
+
+.font-roman {
+  font-feature-settings: 'smcp' 0;
+  letter-spacing: 0.18em;
+}
+
+/* A faint, soft gold focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid rgba(244, 211, 94, 0.55);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Subtle 3D context for cards */
+.card-perspective {
+  perspective: 1400px;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* A whisper of letterpress on display text */
+.text-letterpress {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 175, 55, 0.06);
+}
+
+/* Hide scrollbars on internal scroll regions while keeping behavior */
+.scroll-soft::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-soft::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 6px;
+}
+.scroll-soft::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Reduced motion: keep stillness sacred */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,5 @@
+Image assets go here.
+
+Expected (optional):
+- kim-and-beckee.jpg — End screen photo. Falls back to a text portrait if missing.
+- itinerary/{key}/{1..3}.webp — Per-location galleries (not wired yet, see README).
