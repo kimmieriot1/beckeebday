@@ -109,7 +109,7 @@ export const itinerary = {
     address: '51 High St, Glastonbury BA6 9DS',
     description: "A real reading with a real reader. Booked in Beckee's name. Already paid for.",
     bookingStatus: 'TO BOOK',
-    images: []
+    images: ['/images/itinerary/tarotReading/1.webp']
   },
   cheddar: {
     title: 'Cheddar Gorge',
