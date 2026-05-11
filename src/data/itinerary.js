@@ -49,7 +49,7 @@ export const itinerary = {
     url: 'https://queenofcupsglastonbury.com',
     description: 'Birthday feast. Tasting menu energy. Vegetarian friendly. Booked.',
     bookingStatus: 'TO CONFIRM',
-    images: []
+    images: ['/images/itinerary/queenOfCups/1.webp']
   },
   tor: {
     title: 'Glastonbury Tor',
