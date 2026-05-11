@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiligreeDivider } from '../shared/Filigree.jsx'
 import { exportItineraryPDF } from '../../utils/pdf.js'
+import { downloadICS } from '../../utils/calendar.js'
+import { tap } from '../../utils/haptics.js'
 
 const SPOTIFY_PLAYLIST = '2CtC1fphIpZFwObsxzjnJb'
 
@@ -80,7 +82,7 @@ export default function EndScreen({ onBack }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4, duration: 1.4 }}
-        className="mt-12 flex flex-col items-center gap-4"
+        className="mt-12 flex flex-col items-center gap-3"
       >
         <button
           type="button"
@@ -97,8 +99,23 @@ export default function EndScreen({ onBack }) {
 
         <button
           type="button"
+          onClick={() => {
+            tap()
+            downloadICS()
+          }}
+          className="rounded-full px-6 py-3 font-roman text-[11px] uppercase tracking-sacred text-gold-bright transition-colors"
+          style={{
+            border: '1px solid rgba(212,175,55,0.4)',
+            background: 'rgba(20,16,30,0.4)'
+          }}
+        >
+          Add to your calendar
+        </button>
+
+        <button
+          type="button"
           onClick={onBack}
-          className="font-roman text-[10px] uppercase tracking-sacred text-text-muted hover:text-text-cream"
+          className="mt-2 font-roman text-[10px] uppercase tracking-sacred text-text-muted hover:text-text-cream"
         >
           Return to the cards
         </button>
