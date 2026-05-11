@@ -13,7 +13,6 @@ import MoonPhase from './components/shared/MoonPhase.jsx'
 import AudioToggle from './components/shared/AudioToggle.jsx'
 import GrainOverlay from './components/shared/GrainOverlay.jsx'
 import Vignette from './components/shared/Vignette.jsx'
-import SmokeTransition from './components/shared/SmokeTransition.jsx'
 import { sunCard } from './data/cards.js'
 import { setMuted, startAmbient, primeAudio } from './utils/audio.js'
 
@@ -59,7 +58,7 @@ export default function App() {
             key="landing"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.1 }}
+            transition={{ duration: 0.8 }}
           >
             <LandingScreen
               onBegin={() => {
@@ -104,7 +103,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.1 }}
+            transition={{ duration: 0.8 }}
           >
             <CardSequence onComplete={() => setPhase('spread')} />
           </motion.div>
@@ -116,7 +115,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.1 }}
+            transition={{ duration: 0.8 }}
           >
             <FinalSpread
               sunCardRevealed={sunCardRevealed}
@@ -133,7 +132,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.1 }}
+            transition={{ duration: 0.8 }}
           >
             <EndScreen onBack={() => setPhase('spread')} />
           </motion.div>
@@ -156,9 +155,6 @@ export default function App() {
       {phase !== 'supernova' && phase !== 'landing' && (
         <AudioToggle muted={audioMuted} onToggle={toggleAudio} />
       )}
-
-      {/* phase-change smoke veil, sits below the moon icon and audio toggle */}
-      <SmokeTransition phase={phase} />
 
       <Vignette />
       <GrainOverlay />
