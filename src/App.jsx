@@ -7,6 +7,7 @@ import StarMap from './components/opening/StarMap.jsx'
 import Supernova from './components/opening/Supernova.jsx'
 import CardSequence from './components/cards/CardSequence.jsx'
 import FinalSpread from './components/reveal/FinalSpread.jsx'
+import WeekendMap from './components/reveal/WeekendMap.jsx'
 import ItineraryModal from './components/reveal/ItineraryModal.jsx'
 import EndScreen from './components/reveal/EndScreen.jsx'
 import HiddenSunCard from './components/shared/HiddenSunCard.jsx'
@@ -134,8 +135,20 @@ export default function App() {
               sunCardRevealed={sunCardRevealed}
               sunCard={sunCard}
               onSelect={handleItinerarySelect}
-              onEnd={() => setPhase('end')}
+              onEnd={() => setPhase('map')}
             />
+          </motion.div>
+        )}
+
+        {phase === 'map' && (
+          <motion.div
+            key="map"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <WeekendMap onContinue={() => setPhase('end')} />
           </motion.div>
         )}
 

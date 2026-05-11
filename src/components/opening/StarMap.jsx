@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
   namedStars,
   constellationLines,
   generateBackgroundStars,
   magToRadius
 } from '../../data/starMap1993.js'
-import { thud } from '../../utils/haptics.js'
+import { tap, thud } from '../../utils/haptics.js'
 
 // The night sky over Somerset on 23 June 1993.
 // Stars fade in (4s), constellation lines trace in (2s), text appears (2s).
@@ -15,6 +15,8 @@ export default function StarMap({ onIgnite }) {
   const bg = useMemo(() => generateBackgroundStars(220), [])
   const [textVisible, setTextVisible] = useState(false)
   const [primed, setPrimed] = useState(false)
+  const [revealedId, setRevealedId] = useState(null)
+  const revealTimer = useRef(null)
 
   useEffect(() => {
     const t1 = setTimeout(() => setTextVisible(true), 4500)
@@ -22,8 +24,23 @@ export default function StarMap({ onIgnite }) {
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
+      clearTimeout(revealTimer.current)
     }
   }, [])
+
+  function handleStarTap(star) {
+    setRevealedId(star.id)
+    clearTimeout(revealTimer.current)
+    revealTimer.current = setTimeout(() => setRevealedId(null), 2600)
+
+    if (star.natal && primed) {
+      thud()
+      // Brief delay so the name flashes alongside the supernova start
+      setTimeout(() => onIgnite(), 250)
+    } else {
+      tap()
+    }
+  }
 
   const starById = useMemo(() => {
     const map = {}
@@ -32,22 +49,14 @@ export default function StarMap({ onIgnite }) {
   }, [])
 
   return (
-    <button
-      type="button"
-      aria-label="The night you were born. Tap to continue."
-      onClick={() => {
-        if (primed) {
-          thud()
-          onIgnite()
-        }
-      }}
-      className="relative block min-h-[100dvh] w-full cursor-default"
+    <div
+      aria-label="The night you were born."
+      className="relative block min-h-[100dvh] w-full"
     >
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        aria-hidden="true"
       >
         {/* faint milky band */}
         <defs>
@@ -103,49 +112,101 @@ export default function StarMap({ onIgnite }) {
           )
         })}
 
-        {/* named stars */}
-        {namedStars.map((s, i) => (
-          <motion.g
-            key={s.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              delay: 2 + (i / namedStars.length) * 2,
-              duration: 0.9,
-              ease: 'easeOut'
-            }}
-          >
-            {s.natal && primed && (
-              <motion.circle
-                cx={s.x * 100}
-                cy={s.y * 100}
-                r={magToRadius(s.mag) * 1.2}
-                fill="#f4d35e"
-                opacity="0.18"
-                animate={{ scale: [1, 1.7, 1], opacity: [0.2, 0.5, 0.2] }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ transformOrigin: `${s.x * 100}% ${s.y * 100}%` }}
+        {/* named stars: tappable, reveal their name */}
+        {namedStars.map((s, i) => {
+          const cx = s.x * 100
+          const cy = s.y * 100
+          const isRevealed = revealedId === s.id
+          // Label position: to the right if star is on left half, left if on right
+          const labelOnLeft = s.x > 0.6
+          return (
+            <motion.g
+              key={s.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{
+                delay: 2 + (i / namedStars.length) * 2,
+                duration: 0.9,
+                ease: 'easeOut'
+              }}
+              onClick={() => handleStarTap(s)}
+              style={{ cursor: 'pointer' }}
+              role="button"
+              aria-label={
+                s.natal
+                  ? `${s.name}, the natal star. Tap to ignite the supernova.`
+                  : `${s.name}`
+              }
+              tabIndex={s.natal ? 0 : -1}
+              onKeyDown={(e) => {
+                if (s.natal && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  handleStarTap(s)
+                }
+              }}
+            >
+              {/* Generous invisible tap target around the star */}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={s.natal ? 5 : 3}
+                fill="transparent"
               />
-            )}
-            <circle
-              cx={s.x * 100}
-              cy={s.y * 100}
-              r={magToRadius(s.mag) * 0.45}
-              fill={s.natal ? '#f4d35e' : '#f5f1e8'}
-            />
-            {/* a faint cross-glow on the brightest stars */}
-            {s.mag < 1.5 && (
-              <g
-                stroke={s.natal ? '#f4d35e' : '#f5f1e8'}
-                strokeOpacity="0.45"
-                strokeWidth="0.06"
-              >
-                <line x1={s.x * 100 - 1.4} y1={s.y * 100} x2={s.x * 100 + 1.4} y2={s.y * 100} />
-                <line x1={s.x * 100} y1={s.y * 100 - 1.4} x2={s.x * 100} y2={s.y * 100 + 1.4} />
-              </g>
-            )}
-          </motion.g>
-        ))}
+
+              {s.natal && primed && (
+                <motion.circle
+                  cx={cx}
+                  cy={cy}
+                  r={magToRadius(s.mag) * 1.2}
+                  fill="#f4d35e"
+                  opacity="0.18"
+                  animate={{ scale: [1, 1.7, 1], opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ transformOrigin: `${cx}% ${cy}%` }}
+                />
+              )}
+              <circle
+                cx={cx}
+                cy={cy}
+                r={magToRadius(s.mag) * 0.45}
+                fill={s.natal ? '#f4d35e' : '#f5f1e8'}
+              />
+              {/* a faint cross-glow on the brightest stars */}
+              {s.mag < 1.5 && (
+                <g
+                  stroke={s.natal ? '#f4d35e' : '#f5f1e8'}
+                  strokeOpacity="0.45"
+                  strokeWidth="0.06"
+                >
+                  <line x1={cx - 1.4} y1={cy} x2={cx + 1.4} y2={cy} />
+                  <line x1={cx} y1={cy - 1.4} x2={cx} y2={cy + 1.4} />
+                </g>
+              )}
+
+              {/* Name label, appears briefly on tap */}
+              <AnimatePresence>
+                {isRevealed && (
+                  <motion.text
+                    key="label"
+                    x={labelOnLeft ? cx - 1.5 : cx + 1.5}
+                    y={cy + 0.3}
+                    textAnchor={labelOnLeft ? 'end' : 'start'}
+                    fill="rgba(245,241,232,0.92)"
+                    fontFamily="serif"
+                    fontStyle="italic"
+                    fontSize="1.6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    {s.name}
+                  </motion.text>
+                )}
+              </AnimatePresence>
+            </motion.g>
+          )
+        })}
 
         {/* shooting stars: a few brief streaks during the opening */}
         {SHOOTING_STARS.map((s) => (
@@ -181,7 +242,7 @@ export default function StarMap({ onIgnite }) {
           Tap the brightest star
         </motion.p>
       </div>
-    </button>
+    </div>
   )
 }
 
