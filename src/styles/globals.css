@@ -133,6 +133,16 @@ button {
   text-shadow: 0 0 18px rgba(244, 211, 94, 0.6), 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
+/* Disable default focus outlines on interactive star elements; the outline
+   covers the star name labels which sit just next to the click target. */
+.star-tap-target,
+.star-tap-target:focus,
+.star-tap-target:focus-visible,
+.star-tap-target:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Reduced motion: keep stillness sacred */
 @media (prefers-reduced-motion: reduce) {
   *,

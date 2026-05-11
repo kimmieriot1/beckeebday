@@ -129,8 +129,20 @@ export default function StarMap({ onIgnite }) {
                 duration: 0.9,
                 ease: 'easeOut'
               }}
-              onClick={() => handleStarTap(s)}
-              style={{ cursor: 'pointer' }}
+              className="star-tap-target"
+              onClick={(e) => {
+                handleStarTap(s)
+                // dismiss focus immediately so the browser's outline doesn't
+                // cover the name label
+                if (e && e.currentTarget && e.currentTarget.blur) {
+                  e.currentTarget.blur()
+                }
+              }}
+              style={{
+                cursor: 'pointer',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent'
+              }}
               role="button"
               aria-label={
                 s.natal
