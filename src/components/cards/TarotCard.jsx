@@ -165,23 +165,34 @@ function CardBody({ body, hero }) {
         const baseClass = hero
           ? 'font-period text-[17px] leading-relaxed text-text-cream whitespace-pre-line'
           : 'font-period text-[15px] leading-relaxed text-text-cream whitespace-pre-line'
-        const dropcapClass = isFirst
-          ? hero
-            ? ' dropcap dropcap-hero'
-            : ' dropcap'
-          : ''
         return (
           <motion.p
             key={i}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * stagger, duration: hero ? 1.4 : 0.7, ease: 'easeOut' }}
-            className={baseClass + dropcapClass}
+            className={baseClass}
           >
-            {p}
+            {isFirst ? renderWithInitial(p, hero) : p}
           </motion.p>
         )
       })}
     </div>
+  )
+}
+
+// Wrap the very first character of the first paragraph in an .initial-letter
+// span so we can style it as an illuminated gold initial without using ::first-letter
+// (which doesn't play well with float vs centered text).
+function renderWithInitial(text, hero) {
+  if (!text) return text
+  const first = text[0]
+  const rest = text.slice(1)
+  const cls = hero ? 'initial-letter initial-letter-hero' : 'initial-letter'
+  return (
+    <>
+      <span className={cls}>{first}</span>
+      {rest}
+    </>
   )
 }
