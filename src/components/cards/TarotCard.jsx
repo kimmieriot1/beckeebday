@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import CardBack from './CardBack.jsx'
 import CardFront from './CardFront.jsx'
+import { tap } from '../../utils/haptics.js'
 
 // A tarot card. Tap once to flip, tap continue to advance.
 // Empress (isHero) gets a slower, warmer treatment.
@@ -18,6 +19,7 @@ export default function TarotCard({
 
   function handleCardTap() {
     if (!flipped) {
+      tap()
       setFlipped(true)
       if (onFlip) onFlip(card)
     }
@@ -158,21 +160,28 @@ function CardBody({ body, hero }) {
 
   return (
     <div className="space-y-4">
-      {paragraphs.map((p, i) => (
-        <motion.p
-          key={i}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * stagger, duration: hero ? 1.4 : 0.7, ease: 'easeOut' }}
-          className={
-            hero
-              ? 'font-period text-[17px] leading-relaxed text-text-cream'
-              : 'font-period text-[15px] leading-relaxed text-text-cream'
-          }
-        >
-          {p}
-        </motion.p>
-      ))}
+      {paragraphs.map((p, i) => {
+        const isFirst = i === 0
+        const baseClass = hero
+          ? 'font-period text-[17px] leading-relaxed text-text-cream whitespace-pre-line'
+          : 'font-period text-[15px] leading-relaxed text-text-cream whitespace-pre-line'
+        const dropcapClass = isFirst
+          ? hero
+            ? ' dropcap dropcap-hero'
+            : ' dropcap'
+          : ''
+        return (
+          <motion.p
+            key={i}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * stagger, duration: hero ? 1.4 : 0.7, ease: 'easeOut' }}
+            className={baseClass + dropcapClass}
+          >
+            {p}
+          </motion.p>
+        )
+      })}
     </div>
   )
 }

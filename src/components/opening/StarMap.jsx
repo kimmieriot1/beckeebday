@@ -6,6 +6,7 @@ import {
   generateBackgroundStars,
   magToRadius
 } from '../../data/starMap1993.js'
+import { thud } from '../../utils/haptics.js'
 
 // The night sky over Somerset on 23 June 1993.
 // Stars fade in (4s), constellation lines trace in (2s), text appears (2s).
@@ -34,7 +35,12 @@ export default function StarMap({ onIgnite }) {
     <button
       type="button"
       aria-label="The night you were born. Tap to continue."
-      onClick={() => primed && onIgnite()}
+      onClick={() => {
+        if (primed) {
+          thud()
+          onIgnite()
+        }
+      }}
       className="relative block min-h-[100dvh] w-full cursor-default"
     >
       <svg
@@ -140,6 +146,11 @@ export default function StarMap({ onIgnite }) {
             )}
           </motion.g>
         ))}
+
+        {/* shooting stars: a few brief streaks during the opening */}
+        {SHOOTING_STARS.map((s) => (
+          <ShootingStar key={s.id} {...s} />
+        ))}
       </svg>
 
       {/* text overlay */}
@@ -171,5 +182,53 @@ export default function StarMap({ onIgnite }) {
         </motion.p>
       </div>
     </button>
+  )
+}
+
+// Three streaks at staggered delays during the 8-second opening.
+// Coords in viewBox space (0-100). Each travels from `from` to `to`.
+const SHOOTING_STARS = [
+  { id: 'sh1', from: [12, 8], to: [38, 28], delay: 3.0, duration: 0.9 },
+  { id: 'sh2', from: [78, 12], to: [56, 32], delay: 5.6, duration: 1.0 },
+  { id: 'sh3', from: [30, 4], to: [62, 22], delay: 7.8, duration: 0.85 }
+]
+
+function ShootingStar({ from, to, delay, duration }) {
+  return (
+    <motion.g
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 1, 0] }}
+      transition={{ delay, duration, times: [0, 0.12, 0.7, 1], ease: 'linear' }}
+    >
+      {/* the trail: a line that draws from start to head's position */}
+      <motion.line
+        x1={from[0]}
+        y1={from[1]}
+        stroke="#f5f1e8"
+        strokeOpacity="0.7"
+        strokeWidth="0.18"
+        strokeLinecap="round"
+        initial={{ x2: from[0], y2: from[1] }}
+        animate={{ x2: to[0], y2: to[1] }}
+        transition={{ delay, duration, ease: 'easeOut' }}
+      />
+      {/* the head: a bright gold point */}
+      <motion.circle
+        r="0.45"
+        fill="#f4d35e"
+        initial={{ cx: from[0], cy: from[1] }}
+        animate={{ cx: to[0], cy: to[1] }}
+        transition={{ delay, duration, ease: 'easeOut' }}
+      />
+      {/* head glow */}
+      <motion.circle
+        r="1.0"
+        fill="#f4d35e"
+        opacity="0.3"
+        initial={{ cx: from[0], cy: from[1] }}
+        animate={{ cx: to[0], cy: to[1] }}
+        transition={{ delay, duration, ease: 'easeOut' }}
+      />
+    </motion.g>
   )
 }

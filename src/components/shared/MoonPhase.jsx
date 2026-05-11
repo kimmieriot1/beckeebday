@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { getMoonPhase, getMoonName, getIllumination } from '../../utils/moon.js'
+import { flourish, tap } from '../../utils/haptics.js'
 
 // Top-right indicator. Tap five times within five seconds to summon the Sun.
 export default function MoonPhase({ onFiveTaps }) {
@@ -24,7 +25,10 @@ export default function MoonPhase({ onFiveTaps }) {
     if (tapCount.current >= 5) {
       tapCount.current = 0
       clearTimeout(tapTimer.current)
+      flourish()
       if (onFiveTaps) onFiveTaps()
+    } else {
+      tap()
     }
   }
 

@@ -113,6 +113,28 @@ button {
   background: transparent;
 }
 
+/* Illuminated-manuscript dropcap on the first letter of card body.
+   Kept restrained at 2.6em so it doesn't float into the paragraphs below
+   on cards with short opening lines. Still feels illuminated, not pull-quote. */
+.dropcap::first-letter {
+  font-family: 'Cinzel', 'Trajan Pro', serif;
+  font-size: 2.6em;
+  font-weight: 500;
+  float: left;
+  line-height: 0.9;
+  padding-top: 0.04em;
+  padding-right: 0.1em;
+  margin-bottom: -0.08em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 14px rgba(244, 211, 94, 0.4), 0 1px 0 rgba(0, 0, 0, 0.6);
+  letter-spacing: 0;
+}
+
+.dropcap-hero::first-letter {
+  font-size: 3em;
+  text-shadow: 0 0 22px rgba(244, 211, 94, 0.55), 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
 /* Reduced motion: keep stillness sacred */
 @media (prefers-reduced-motion: reduce) {
   *,
