@@ -1,7 +1,7 @@
-// Card art. Uses the painted image at /public/images/cards/{id}.jpg by default,
-// with the hand-drawn SVG placeholder shown while the image loads or if it fails.
+// Card art. Hand-drawn SVG placeholders, one per card.
+// To switch to painted art later, drop {id}.jpg files into
+// /public/images/cards/ and restore the img layer here.
 
-import { useState } from 'react'
 import TheFool from './TheFool.jsx'
 import TheHighPriestess from './TheHighPriestess.jsx'
 import TheStar from './TheStar.jsx'
@@ -13,7 +13,7 @@ import TheLovers from './TheLovers.jsx'
 import TheWorld from './TheWorld.jsx'
 import TheSun from './TheSun.jsx'
 
-const placeholderMap = {
+const map = {
   1: TheFool,
   2: TheHighPriestess,
   3: TheStar,
@@ -27,26 +27,7 @@ const placeholderMap = {
 }
 
 export default function CardArt({ id }) {
-  const [state, setState] = useState('loading') // loading | loaded | failed
-  const Placeholder = placeholderMap[id]
-
-  return (
-    <>
-      {state !== 'loaded' && Placeholder && <Placeholder />}
-      {state !== 'failed' && (
-        <img
-          src={`/images/cards/${id}.jpg`}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          decoding="async"
-          style={{
-            opacity: state === 'loaded' ? 1 : 0,
-            transition: 'opacity 700ms ease'
-          }}
-          onLoad={() => setState('loaded')}
-          onError={() => setState('failed')}
-        />
-      )}
-    </>
-  )
+  const Component = map[id]
+  if (!Component) return null
+  return <Component />
 }
