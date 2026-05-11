@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import LandingScreen from './components/opening/LandingScreen.jsx'
+import OpeningLetter from './components/opening/OpeningLetter.jsx'
 import StarMap from './components/opening/StarMap.jsx'
 import Supernova from './components/opening/Supernova.jsx'
 import CardSequence from './components/cards/CardSequence.jsx'
@@ -67,9 +68,21 @@ export default function App() {
                   setAudioMutedState(false)
                   startAmbient()
                 }
-                setPhase('starMap')
+                setPhase('letter')
               }}
             />
+          </motion.div>
+        )}
+
+        {phase === 'letter' && (
+          <motion.div
+            key="letter"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <OpeningLetter onContinue={() => setPhase('starMap')} />
           </motion.div>
         )}
 
